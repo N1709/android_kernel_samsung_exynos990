@@ -46,6 +46,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          submodules: recursive
 
       - name: Free disk space
         run: |
@@ -72,19 +73,40 @@ jobs:
       - name: Configure
         run: |
           export PATH="$CLANG_DIR/bin:$PATH"
-          make ARCH=arm64 LLVM=1 LLVM_IAS=1 O=out \
-            exynos990_defconfig "${MODEL}.config"
-          if [ "${{ github.event.inputs.lto }}" != "true" ]; then
-            ./scripts/config --file out/.config \
-              -d LTO -d LTO_CLANG -d DEBUG_INFO
-          fi
-          make ARCH=arm64 LLVM=1 LLVM_IAS=1 O=out olddefconfig
+          set -o pipefail
+          {
+            make ARCH=arm64 LLVM=1 LLVM_IAS=1 O=out \
+              exynos990_defconfig "${MODEL}.config"
+            if [ "${{ github.event.inputs.lto }}" != "true" ]; then
+              ./scripts/config --file out/.config \
+                -d LTO -d LTO_CLANG -d DEBUG_INFO
+            fi
+            make ARCH=arm64 LLVM=1 LLVM_IAS=1 O=out olddefconfig
+          } 2>&1 | tee /tmp/configure.log
           grep -E 'CONFIG_LOCALVERSION=|CONFIG_LTO|CONFIG_DEBUG_INFO=' out/.config | head
+
+      - name: Report configure failure
+        if: failure()
+        run: |
+          if [ -f /tmp/configure.log ]; then
+            msg=$(tail -n 25 /tmp/configure.log | awk '{printf "%s%%0A", $0}')
+            echo "::error title=kconfig failed::$msg"
+          fi
 
       - name: Build kernel
         run: |
           export PATH="$CLANG_DIR/bin:$PATH"
-          make ARCH=arm64 LLVM=1 LLVM_IAS=1 O=out -j"$(nproc)"
+          set -o pipefail
+          make ARCH=arm64 LLVM=1 LLVM_IAS=1 O=out -j"$(nproc)" 2>&1 | tee /tmp/build.log
+
+      - name: Report compile failure
+        if: failure()
+        run: |
+          if [ -f /tmp/build.log ]; then
+            msg=$(grep -nE 'error:|Error [0-9]|fatal error' /tmp/build.log | tail -n 20 | awk '{printf "%s%%0A", $0}')
+            [ -n "$msg" ] || msg=$(tail -n 25 /tmp/build.log | awk '{printf "%s%%0A", $0}')
+            echo "::error title=compile failed::$msg"
+          fi
 
       - name: Build DTB and DTBO images
         run: |
