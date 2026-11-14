@@ -1,0 +1,108 @@
+name: Exynos 990 Compile
+
+on:
+  push:
+    branches:
+      - rebased-11-z3s
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Device model"
+        required: true
+        default: z3s
+        type: choice
+        options:
+          - z3s
+          - x1s
+          - x1slte
+          - y2s
+          - y2slte
+          - c1s
+          - c1slte
+          - c2s
+          - c2slte
+          - r8s
+      lto:
+        description: "Keep ThinLTO enabled (slow, production config)"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: exynos990-${{ github.ref }}-${{ github.event.inputs.model || 'z3s' }}
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+
+    env:
+      MODEL: ${{ github.event.inputs.model || 'z3s' }}
+      CLANG_DIR: ${{ github.workspace }}/toolchain/clang-r614150
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /usr/local/share/boost /opt/hostedtoolcache/CodeQL
+          sudo apt-get clean
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc bison flex libssl-dev libelf-dev lz4 \
+            zstd cpio rsync python3 zip
+
+      - name: Download toolchain
+        run: |
+          mkdir -p "$CLANG_DIR"
+          curl -L --retry 10 --retry-delay 3 --retry-all-errors \
+            -o clang.tar.gz \
+            "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/mirror-goog-main-llvm-toolchain-source/clang-r614150.tar.gz"
+          tar xf clang.tar.gz -C "$CLANG_DIR"
+          rm -f clang.tar.gz
+          "$CLANG_DIR/bin/clang" --version | head -2
+
+      - name: Configure
+        run: |
+          export PATH="$CLANG_DIR/bin:$PATH"
+          make ARCH=arm64 LLVM=1 LLVM_IAS=1 O=out \
+            exynos990_defconfig "${MODEL}.config"
+          if [ "${{ github.event.inputs.lto }}" != "true" ]; then
+            ./scripts/config --file out/.config \
+              -d LTO -d LTO_CLANG -d DEBUG_INFO
+          fi
+          make ARCH=arm64 LLVM=1 LLVM_IAS=1 O=out olddefconfig
+          grep -E 'CONFIG_LOCALVERSION=|CONFIG_LTO|CONFIG_DEBUG_INFO=' out/.config | head
+
+      - name: Build kernel
+        run: |
+          export PATH="$CLANG_DIR/bin:$PATH"
+          make ARCH=arm64 LLVM=1 LLVM_IAS=1 O=out -j"$(nproc)"
+
+      - name: Build DTB and DTBO images
+        run: |
+          ./toolchain/mkdtimg cfg_create out/dtb.img \
+            build/dtconfigs/exynos990.cfg -d out/arch/arm64/boot/dts/exynos
+          ./toolchain/mkdtimg cfg_create out/dtbo.img \
+            "build/dtconfigs/${MODEL}.cfg" \
+            -d "out/arch/arm64/boot/dts/samsung/${MODEL}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: exynos990-${{ env.MODEL }}-${{ github.sha }}
+          if-no-files-found: warn
+          path: |
+            out/arch/arm64/boot/Image
+            out/arch/arm64/boot/Image.gz
+            out/dtb.img
+            out/dtbo.img
+            out/.config
+            out/System.map
