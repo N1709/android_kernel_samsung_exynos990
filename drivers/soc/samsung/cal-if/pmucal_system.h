@@ -37,6 +37,14 @@ enum sys_powerdown {
 	NUM_SYS_POWERDOWN,
 };
 
+/*
+ * Exynos 990 refers to the same low-power slot as HSI2ON. The index is
+ * shared with HSI1ON, only the hardware block name differs.
+ */
+#if IS_ENABLED(CONFIG_SOC_EXYNOS9830)
+#define SYS_SLEEP_HSI2ON	SYS_SLEEP_HSI1ON
+#endif
+
 /* APIs to be supported to PWRCAL interface */
 extern int pmucal_system_enter(int mode);
 extern int pmucal_system_exit(int mode);
