@@ -449,7 +449,7 @@ build_vendor_boot() {
     # Pack RAMDisks
     # vendor_ramdisk == ramdisk00
     pushd build/out/$MODEL/vendor_ramdisk00 > /dev/null
-    find . ! -name . | LC_ALL=C sort | cpio -o -H newc -R root:root | gzip -c > ../$MODEl/vendor_ramdisk || abort
+    find . ! -name . | LC_ALL=C sort | cpio -o -H newc -R root:root | gzip -c > ../${MODEL}/vendor_ramdisk || abort
     popd > /dev/null
 
     echo "-----------------------------------------------"
@@ -504,7 +504,7 @@ build_zip() {
 
     pushd "$AK3_DIR" > /dev/null
 
-    version=$(grep -o 'CONFIG_LOCALVERSION="[^"]*"' ../arch/arm64/configs/exynos2100_defconfig | cut -d '"' -f 2)
+    version=$(grep -o 'CONFIG_LOCALVERSION="[^"]*"' "../arch/arm64/configs/${KERNEL_DEFCONFIG}" | cut -d '"' -f 2)
     version=${version:1}
     DATE=`date +"%d-%m-%Y_%H-%M-%S"`
 
