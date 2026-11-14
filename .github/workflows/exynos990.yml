@@ -2,8 +2,8 @@ name: Exynos 990 Compile
 
 on:
   push:
-    branches:
-      - "openela-5.4"
+    tags:
+      - "ci-*"
   workflow_dispatch:
     inputs:
       model:
