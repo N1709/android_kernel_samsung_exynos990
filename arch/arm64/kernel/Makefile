@@ -33,6 +33,8 @@ obj-y			:= debug-monitors.o entry.o irq.o fpsimd.o		\
 
 extra-$(CONFIG_EFI)			:= efi-entry.o
 
+obj-$(CONFIG_ARCH_EXYNOS)		+= exynos-smc.o
+
 OBJCOPYFLAGS := --prefix-symbols=__efistub_
 $(obj)/%.stub.o: $(obj)/%.o FORCE
 	$(call if_changed,objcopy)

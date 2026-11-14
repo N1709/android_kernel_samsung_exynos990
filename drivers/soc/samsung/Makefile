@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
+obj-$(CONFIG_ARCH_EXYNOS)	+= exynos-smc.o
 obj-$(CONFIG_EXYNOS_SEH)	+= exynos-seh.o
 
 obj-$(CONFIG_EXYNOS_PD_EL3)	+= exynos-pd_el3.o
