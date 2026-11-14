@@ -14,6 +14,11 @@ cmupmucal-$(CONFIG_SOC_EXYNOS2100)	+= exynos2100/cal_data.o
 else
 cmupmucal-$(CONFIG_SOC_EXYNOS2100_EVT0)	+= exynos2100_evt0/cal_data.o
 endif
+ifndef CONFIG_SOC_EXYNOS9830_EVT0
+cmupmucal-$(CONFIG_SOC_EXYNOS9830)	+= exynos9830/cal_data.o
+else
+cmupmucal-$(CONFIG_SOC_EXYNOS9830_EVT0)	+= exynos9830_evt0/cal_data.o
+endif
 cmupmucal-$(CONFIG_ACPM_DVFS)		+= acpm_dvfs.o fvmap.o
 cmupmucal-$(CONFIG_EXYNOS_DEBUG_FREQ)        += exynos_debug_freq.o
 

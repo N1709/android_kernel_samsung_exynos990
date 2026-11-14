@@ -359,6 +359,7 @@ extern const struct samsung_pinctrl_of_match_data exynos5420_of_data;
 extern const struct samsung_pinctrl_of_match_data exynos5433_of_data;
 extern const struct samsung_pinctrl_of_match_data exynos9820_of_data;
 extern const struct samsung_pinctrl_of_match_data exynos2100_of_data;
+extern const struct samsung_pinctrl_of_match_data exynos9830_of_data;
 extern const struct samsung_pinctrl_of_match_data exynos7_of_data;
 extern const struct samsung_pinctrl_of_match_data s3c64xx_of_data;
 extern const struct samsung_pinctrl_of_match_data s3c2412_of_data;

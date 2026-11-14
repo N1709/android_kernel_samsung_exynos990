@@ -122,10 +122,68 @@ t2s)
 p3s)
     BOARD=SRPTH19D013KU
 ;;
+x1s)
+    BOARD=SRPSI19A018KU
+    KERNEL_DEFCONFIG=exynos990_defconfig
+    DTB_CONFIG=x1s.cfg
+;;
+x1slte)
+    BOARD=SRPSJ28B018KU
+    KERNEL_DEFCONFIG=exynos990_defconfig
+    DTB_CONFIG=x1slte.cfg
+;;
+y2s)
+    BOARD=SRPSG12A018KU
+    KERNEL_DEFCONFIG=exynos990_defconfig
+    DTB_CONFIG=y2s.cfg
+;;
+y2slte)
+    BOARD=SRPSJ28A018KU
+    KERNEL_DEFCONFIG=exynos990_defconfig
+    DTB_CONFIG=y2slte.cfg
+;;
+z3s)
+    BOARD=SRPSI19B018KU
+    KERNEL_DEFCONFIG=exynos990_defconfig
+    DTB_CONFIG=z3s.cfg
+;;
+c1s)
+    BOARD=SRPTB27D009KU
+    KERNEL_DEFCONFIG=exynos990_defconfig
+    DTB_CONFIG=c1s.cfg
+;;
+c1slte)
+    BOARD=SRPTC30B009KU
+    KERNEL_DEFCONFIG=exynos990_defconfig
+    DTB_CONFIG=c1slte.cfg
+;;
+c2s)
+    BOARD=SRPTB27C009KU
+    KERNEL_DEFCONFIG=exynos990_defconfig
+    DTB_CONFIG=c2s.cfg
+;;
+c2slte)
+    BOARD=SRPTC30A009KU
+    KERNEL_DEFCONFIG=exynos990_defconfig
+    DTB_CONFIG=c2slte.cfg
+;;
+r8s)
+    BOARD=SRPTF26B014KU
+    KERNEL_DEFCONFIG=exynos990_defconfig
+    DTB_CONFIG=r8s.cfg
+;;
+
 *)
     unset_flags
     exit
 esac
+
+if [ -z "$KERNEL_DEFCONFIG" ]; then
+    KERNEL_DEFCONFIG=exynos2100_defconfig
+fi
+if [ -z "$DTB_CONFIG" ]; then
+    DTB_CONFIG=exynos2100.cfg
+fi
 
 if [[ "$RECOVERY_OPTION" == "y" ]]; then
     RECOVERY=recovery.config
@@ -209,7 +267,7 @@ build_kernel() {
     echo "Building kernel using "$KERNEL_DEFCONFIG""
     echo "Generating configuration file..."
     echo "-----------------------------------------------"
-    make ${MAKE_ARGS} -j$CORES exynos2100_defconfig $MODEL.config $RECOVERY $KSU $SUSFS || abort
+    make ${MAKE_ARGS} -j$CORES ${KERNEL_DEFCONFIG} $MODEL.config $RECOVERY $KSU $SUSFS || abort
 
     set_localversion
 
@@ -253,7 +311,7 @@ build_boot() {
 build_dtb() {
     echo "-----------------------------------------------"
     echo "Building DTB image..."
-    ./toolchain/mkdtimg cfg_create build/out/$MODEL/dtb.img build/dtconfigs/exynos2100.cfg -d out/arch/arm64/boot/dts/exynos || abort 
+    ./toolchain/mkdtimg cfg_create build/out/$MODEL/dtb.img build/dtconfigs/${DTB_CONFIG} -d out/arch/arm64/boot/dts/exynos || abort 
 
     echo "-----------------------------------------------"
     echo "Building DTBO image..."

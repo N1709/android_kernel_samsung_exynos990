@@ -1610,6 +1610,8 @@ static const struct of_device_id samsung_pinctrl_dt_match[] = {
 		.data = &exynos9820_of_data },
 	{ .compatible = "samsung,exynos2100-pinctrl",
 		.data = &exynos2100_of_data },
+	{ .compatible = "samsung,exynos9830-pinctrl",
+		.data = &exynos9830_of_data },
 #endif
 #ifdef CONFIG_PINCTRL_S3C64XX
 	{ .compatible = "samsung,s3c64xx-pinctrl",
@@ -1953,6 +1955,32 @@ const struct secgpio_dvs_data exynos2100_secgpio_dvs_data = {
 	.get_nr_gpio = exynos2100_secgpio_get_nr_gpio,
 };
 EXPORT_SYMBOL_GPL(exynos2100_secgpio_dvs_data);
+static int exynos9830_secgpio_get_nr_gpio(void)
+{
+	unsigned int i, j;
+	int nr_gpio = 0;
+	const struct samsung_pin_ctrl *pin_ctrl = exynos9830_of_data.ctrl;
+	unsigned int num_ctrl = exynos9830_of_data.num_ctrl;
+
+	for (i = 0; i < num_ctrl; i++) {
+		for (j = 0; j < pin_ctrl[i].nr_banks; j++)
+			nr_gpio += pin_ctrl[i].pin_banks[j].nr_pins;
+	}
+
+	return nr_gpio;
+}
+
+static struct gpio_dvs_t exynos9830_secgpio_dvs = {
+	.result = &gpiomap_result,
+	.check_gpio_status = check_gpio_status,
+	.skip_grps = "gpv", /* DMIC(VTS) */
+};
+
+const struct secgpio_dvs_data exynos9830_secgpio_dvs_data = {
+	.gpio_dvs = &exynos9830_secgpio_dvs,
+	.get_nr_gpio = exynos9830_secgpio_get_nr_gpio,
+};
+EXPORT_SYMBOL_GPL(exynos9830_secgpio_dvs_data);
 #endif /* CONFIG_PINCTRL_SEC_GPIO_DVS */
 
 MODULE_LICENSE("GPL");

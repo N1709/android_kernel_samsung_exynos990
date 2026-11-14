@@ -21,6 +21,18 @@ config SOC_EXYNOS2100_EVT0
 	help
 	Support Samsung SOC Exynos2100 EVT0.
 
+config SOC_EXYNOS9830
+	bool "Samsung EXYNOS9830"
+	select SOC_SAMSUNG
+	help
+	Support Samsung SOC Exynos9830.
+
+config SOC_EXYNOS9830_EVT0
+	bool "Samsung EXYNOS9830 EVT0"
+	select SOC_SAMSUNG
+	help
+	Support Samsung SOC Exynos9830 EVT0.
+
 if SOC_SAMSUNG
 
 config EXYNOS_CHIPID

@@ -136,7 +136,11 @@ enum {
  *
  * DO NOT MOVE THIS TO ANYWHERE RANDOMLY !!!
  */
+#ifdef CONFIG_SOC_EXYNOS9830
+#include "ufs-cal-9830.h"
+#else
 #include "ufs-cal-2100.h"
+#endif
 
 /* Version check */
 #if (UFS_CAL_IF_COMPAT_MMIO_VER != UFS_VS_MMIO_VER)

@@ -104,6 +104,56 @@ config MODEL_T2S
 	default n
 	depends on SOC_EXYNOS2100
 
+config MODEL_Z3S
+	bool "Samsung Galaxy S20 Ultra 5G"
+	default n
+	depends on SOC_EXYNOS9830
+
+config MODEL_X1S
+	bool "Samsung Galaxy S20 5G"
+	default n
+	depends on SOC_EXYNOS9830
+
+config MODEL_X1SLTE
+	bool "Samsung Galaxy S20 4G"
+	default n
+	depends on SOC_EXYNOS9830
+
+config MODEL_Y2S
+	bool "Samsung Galaxy S20+ 5G"
+	default n
+	depends on SOC_EXYNOS9830
+
+config MODEL_Y2SLTE
+	bool "Samsung Galaxy S20+ 4G"
+	default n
+	depends on SOC_EXYNOS9830
+
+config MODEL_C1S
+	bool "Samsung Galaxy Note20 5G"
+	default n
+	depends on SOC_EXYNOS9830
+
+config MODEL_C1SLTE
+	bool "Samsung Galaxy Note20 4G"
+	default n
+	depends on SOC_EXYNOS9830
+
+config MODEL_C2S
+	bool "Samsung Galaxy Note20 Ultra 5G"
+	default n
+	depends on SOC_EXYNOS9830
+
+config MODEL_C2SLTE
+	bool "Samsung Galaxy Note20 Ultra 4G"
+	default n
+	depends on SOC_EXYNOS9830
+
+config MODEL_R8S
+	bool "Samsung Galaxy S20 FE 4G"
+	default n
+	depends on SOC_EXYNOS9830
+
 config ARCH_K3
 	bool "Texas Instruments Inc. K3 multicore SoC architecture"
 	select PM_GENERIC_DOMAINS if PM

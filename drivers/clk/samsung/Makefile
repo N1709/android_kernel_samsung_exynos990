@@ -29,4 +29,9 @@ clk_exynos-$(CONFIG_COMPOSITE_CLK_SAMSUNG)	+= clk-exynos2100.o
 else
 clk_exynos-$(CONFIG_COMPOSITE_CLK_SAMSUNG)	+= clk-exynos2100_evt0.o
 endif
+ifndef CONFIG_SOC_EXYNOS9830_EVT0
+clk_exynos-$(CONFIG_COMPOSITE_CLK_SAMSUNG)	+= clk-exynos9830.o
+else
+clk_exynos-$(CONFIG_COMPOSITE_CLK_SAMSUNG)	+= clk-exynos9830_evt0.o
+endif
 clk_exynos-$(CONFIG_COMPOSITE_CLK_SAMSUNG)	+= composite.o
